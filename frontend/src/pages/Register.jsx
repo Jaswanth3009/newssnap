@@ -30,29 +30,6 @@ const Register = () => {
     if (success) navigate('/dashboard');
   };
 
-  const Field = ({ label, name, type = 'text', icon: Icon, placeholder, extra }) => (
-    <div>
-      <label className="block text-sm font-medium text-gray-300 mb-2">{label}</label>
-      <div className="relative">
-        <Icon className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-500 w-4 h-4" />
-        <input
-          type={type}
-          value={form[name]}
-          onChange={(e) => setForm({ ...form, [name]: e.target.value })}
-          placeholder={placeholder}
-          className={`input-field pl-11 ${extra || ''} ${errors[name] ? 'border-red-500 focus:border-red-500 focus:ring-red-500' : ''}`}
-        />
-        {name === 'password' && (
-          <button type="button" onClick={() => setShowPass(!showPass)}
-            className="absolute right-4 top-1/2 -translate-y-1/2 text-gray-500 hover:text-gray-300">
-            {showPass ? <FiEyeOff className="w-4 h-4" /> : <FiEye className="w-4 h-4" />}
-          </button>
-        )}
-      </div>
-      {errors[name] && <p className="text-red-400 text-xs mt-1">{errors[name]}</p>}
-    </div>
-  );
-
   return (
     <div className="min-h-screen flex items-center justify-center px-4 bg-gray-950 py-10">
       <div className="absolute inset-0 overflow-hidden pointer-events-none">
@@ -70,10 +47,77 @@ const Register = () => {
 
         <div className="bg-gray-900 border border-gray-800 rounded-2xl p-8">
           <form onSubmit={handleSubmit} className="space-y-5">
-            <Field label="Username" name="username" icon={FiUser} placeholder="johndoe" />
-            <Field label="Email" name="email" type="email" icon={FiMail} placeholder="you@example.com" />
-            <Field label="Password" name="password" type={showPass ? 'text' : 'password'} icon={FiLock} placeholder="Min. 6 characters" />
-            <Field label="Confirm Password" name="confirmPassword" type="password" icon={FiLock} placeholder="Repeat password" />
+
+            {/* Username */}
+            <div>
+              <label className="block text-sm font-medium text-gray-300 mb-2">Username</label>
+              <div className="relative">
+                <FiUser className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-500 w-4 h-4" />
+                <input
+                  type="text"
+                  value={form.username}
+                  onChange={(e) => setForm({ ...form, username: e.target.value })}
+                  placeholder="dharmateja"
+                  className={`input-field pl-11 ${errors.username ? 'border-red-500' : ''}`}
+                />
+              </div>
+              {errors.username && <p className="text-red-400 text-xs mt-1">{errors.username}</p>}
+            </div>
+
+            {/* Email */}
+            <div>
+              <label className="block text-sm font-medium text-gray-300 mb-2">Email</label>
+              <div className="relative">
+                <FiMail className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-500 w-4 h-4" />
+                <input
+                  type="email"
+                  value={form.email}
+                  onChange={(e) => setForm({ ...form, email: e.target.value })}
+                  placeholder="you@example.com"
+                  className={`input-field pl-11 ${errors.email ? 'border-red-500' : ''}`}
+                />
+              </div>
+              {errors.email && <p className="text-red-400 text-xs mt-1">{errors.email}</p>}
+            </div>
+
+            {/* Password */}
+            <div>
+              <label className="block text-sm font-medium text-gray-300 mb-2">Password</label>
+              <div className="relative">
+                <FiLock className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-500 w-4 h-4" />
+                <input
+                  type={showPass ? 'text' : 'password'}
+                  value={form.password}
+                  onChange={(e) => setForm({ ...form, password: e.target.value })}
+                  placeholder="Min. 6 characters"
+                  className={`input-field pl-11 pr-11 ${errors.password ? 'border-red-500' : ''}`}
+                />
+                <button
+                  type="button"
+                  onClick={() => setShowPass(!showPass)}
+                  className="absolute right-4 top-1/2 -translate-y-1/2 text-gray-500 hover:text-gray-300"
+                >
+                  {showPass ? <FiEyeOff className="w-4 h-4" /> : <FiEye className="w-4 h-4" />}
+                </button>
+              </div>
+              {errors.password && <p className="text-red-400 text-xs mt-1">{errors.password}</p>}
+            </div>
+
+            {/* Confirm Password */}
+            <div>
+              <label className="block text-sm font-medium text-gray-300 mb-2">Confirm Password</label>
+              <div className="relative">
+                <FiLock className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-500 w-4 h-4" />
+                <input
+                  type="password"
+                  value={form.confirmPassword}
+                  onChange={(e) => setForm({ ...form, confirmPassword: e.target.value })}
+                  placeholder="Repeat password"
+                  className={`input-field pl-11 ${errors.confirmPassword ? 'border-red-500' : ''}`}
+                />
+              </div>
+              {errors.confirmPassword && <p className="text-red-400 text-xs mt-1">{errors.confirmPassword}</p>}
+            </div>
 
             <button
               type="submit"
