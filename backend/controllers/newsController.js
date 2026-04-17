@@ -21,18 +21,53 @@ const fetchAndStoreNews = async (req, res) => {
   try {
     const apiKey = process.env.NEWS_API_KEY;
     let articles = [];
+
     if (apiKey && apiKey !== 'your_newsapi_key_here') {
-      const categories = ['technology', 'sports', 'business', 'entertainment', 'health'];
-      for (const cat of categories) {
-        const response = await axios.get(`https://newsapi.org/v2/top-headlines?category=${cat}&country=in&pageSize=8&apiKey=${apiKey}`);
-        const mapped = response.data.articles.filter((a) => a.title && a.description).map((a) => ({ title: a.title, summary: a.description, category: cat.charAt(0).toUpperCase() + cat.slice(1), source: a.source?.name || 'Unknown', imageUrl: a.urlToImage || '', originalUrl: a.url || '', publishedAt: new Date(a.publishedAt) }));
-        articles = [...articles, ...mapped];
+      const queries = [
+        { q: 'India technology ISRO Tata Infosys', category: 'Technology' },
+        { q: 'IPL cricket India sports Virat Rohit', category: 'Sports' },
+        { q: 'India economy Sensex RBI budget', category: 'Business' },
+        { q: 'Bollywood India movies Netflix', category: 'Entertainment' },
+        { q: 'India politics parliament Modi BJP', category: 'Politics' },
+        { q: 'India health AIIMS hospital medicine', category: 'Health' },
+      ];
+
+      for (const item of queries) {
+        try {
+          const response = await axios.get(
+            `https://newsapi.org/v2/everything?q=${encodeURIComponent(item.q)}&language=en&sortBy=publishedAt&pageSize=5&apiKey=${apiKey}`
+          );
+          const mapped = response.data.articles
+            .filter((a) => a.title && a.description && a.title !== '[Removed]')
+            .map((a) => ({
+              title: a.title,
+              summary: a.description,
+              category: item.category,
+              source: a.source?.name || 'Unknown',
+              imageUrl: a.urlToImage || '',
+              originalUrl: a.url || '',
+              publishedAt: new Date(a.publishedAt),
+            }));
+          articles = [...articles, ...mapped];
+        } catch (e) {
+          console.log(`Skipping ${item.category}:`, e.message);
+        }
       }
     } else {
       articles = mockNews;
     }
+
+    // Remove duplicate titles
+    const seen = new Set();
+    articles = articles.filter((a) => {
+      if (seen.has(a.title)) return false;
+      seen.add(a.title);
+      return true;
+    });
+
     await News.deleteMany({});
     await News.insertMany(articles);
+
     res.json({ message: `✅ ${articles.length} news articles stored`, count: articles.length });
   } catch (error) {
     res.status(500).json({ message: error.message });
